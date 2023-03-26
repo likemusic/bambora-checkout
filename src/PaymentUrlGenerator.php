@@ -324,9 +324,6 @@ class PaymentUrlGenerator
     public function makeByArray(array $params): string
     {
         return $this->makeByParams(
-        // Authorization
-            $params[LinkParameters::MERCHANT_ID] ?? null,
-
             // Order info
             $params[LinkParameters::TRN_AMOUNT] ?? null,
             $params[LinkParameters::TRN_ORDER_NUMBER] ?? null,
@@ -368,220 +365,15 @@ class PaymentUrlGenerator
             $params[LinkParameters::REF3] ?? null,
             $params[LinkParameters::REF4] ?? null,
             $params[LinkParameters::REF5] ?? null,
+
+            // Authorization
+            $params[LinkParameters::MERCHANT_ID] ?? null,
+
+            $params[LinkParameters::HASH_KEY] ?? null,
         );
     }
 
     public function makeByParams(
-        string $hashKey = null,
-
-        // Authorization
-               $merchantId = null,
-
-        // Order info
-               $trnAmount = null,
-               $trnOrderNumber = null,
-               $trnType = null,
-               $trnCardOwner = null,
-               $trnLanguage = null,
-
-        // Billing address
-               $ordName = null,
-               $ordEmailAddress = null,
-               $ordAddress1 = null,
-               $ordAddress2 = null,
-               $ordCity = null,
-               $ordProvince = null,
-               $ordPostalCode = null,
-               $ordCountry = null,
-
-        // Shipping address
-               $shipName = null,
-               $shipEmailAddress = null,
-               $shipAddress1 = null,
-               $shipAddress2 = null,
-               $shipCity = null,
-               $shipProvince = null,
-               $shipPostalCode = null,
-               $shipCountry = null,
-               $shipPhoneAddress = null,
-
-        // Redirects
-               $approvedPage = null,
-               $declinedPage = null,
-
-        // Hash expiry
-               $hashExpiry = null,
-
-        // References info
-               $ref1 = null,
-               $ref2 = null,
-               $ref3 = null,
-               $ref4 = null,
-               $ref5 = null
-    ): string
-    {
-        $resultQueryString = $this->getResultQueryStringByParams(
-            $hashKey,
-
-            // Authorization
-            $merchantId,
-
-            // Order info
-            $trnAmount,
-            $trnOrderNumber,
-            $trnType,
-            $trnCardOwner,
-            $trnLanguage,
-
-            // Billing address
-            $ordName,
-            $ordEmailAddress,
-            $ordAddress1,
-            $ordAddress2,
-            $ordCity,
-            $ordProvince,
-            $ordPostalCode,
-            $ordCountry,
-
-            // Shipping address
-            $shipName,
-            $shipEmailAddress,
-            $shipAddress1,
-            $shipAddress2,
-            $shipCity,
-            $shipProvince,
-            $shipPostalCode,
-            $shipCountry,
-            $shipPhoneAddress,
-
-            // Redirects
-            $approvedPage,
-            $declinedPage,
-
-            // Hash expiry
-            $hashExpiry,
-
-            // References info
-            $ref1,
-            $ref2,
-            $ref3,
-            $ref4,
-            $ref5,
-        );
-
-        return "{$this->baseUrl}?{$resultQueryString}";
-    }
-
-    private function getResultQueryStringByParams(
-        string $hashKey = null,
-
-        // Authorization
-               $merchantId = null,
-
-        // Order info
-               $trnAmount = null,
-               $trnOrderNumber = null,
-               $trnType = null,
-               $trnCardOwner = null,
-               $trnLanguage = null,
-
-        // Billing address
-               $ordName = null,
-               $ordEmailAddress = null,
-               $ordAddress1 = null,
-               $ordAddress2 = null,
-               $ordCity = null,
-               $ordProvince = null,
-               $ordPostalCode = null,
-               $ordCountry = null,
-
-        // Shipping address
-               $shipName = null,
-               $shipEmailAddress = null,
-               $shipAddress1 = null,
-               $shipAddress2 = null,
-               $shipCity = null,
-               $shipProvince = null,
-               $shipPostalCode = null,
-               $shipCountry = null,
-               $shipPhoneAddress = null,
-
-        // Redirects
-               $approvedPage = null,
-               $declinedPage = null,
-
-        // Hash expiry
-               $hashExpiry = null,
-
-        // References info
-               $ref1 = null,
-               $ref2 = null,
-               $ref3 = null,
-               $ref4 = null,
-               $ref5 = null
-    ): string
-    {
-        $hashedParams = $this->getHashedParams(
-            // Authorization
-            $merchantId,
-
-            // Order info
-            $trnAmount,
-            $trnOrderNumber,
-            $trnType,
-            $trnCardOwner,
-            $trnLanguage,
-
-            // Billing address
-            $ordName,
-            $ordEmailAddress,
-            $ordAddress1,
-            $ordAddress2,
-            $ordCity,
-            $ordProvince,
-            $ordPostalCode,
-            $ordCountry,
-
-            // Shipping address
-            $shipName,
-            $shipEmailAddress,
-            $shipAddress1,
-            $shipAddress2,
-            $shipCity,
-            $shipProvince,
-            $shipPostalCode,
-            $shipCountry,
-            $shipPhoneAddress,
-
-            // Redirects
-            $approvedPage,
-            $declinedPage,
-
-            // Hash expiry
-            $hashExpiry,
-
-            // References info
-            $ref1,
-            $ref2,
-            $ref3,
-            $ref4,
-            $ref5,
-        );
-
-        $hashedQueryString = http_build_query($hashedParams);
-        $resultHashKey = $this->getResultHashKey($hashKey);
-        $hashedString = $hashedQueryString . $resultHashKey;
-        $hashValue = $this->hash($hashedString);
-
-        $resultParams = array_merge($hashedParams, ['hashValue' => $hashValue]);
-
-        return http_build_query($resultParams);
-    }
-
-    private function getHashedParams(
-        // Authorization
-        $merchantId = null,
-
         // Order info
         $trnAmount = null,
         $trnOrderNumber = null,
@@ -622,7 +414,217 @@ class PaymentUrlGenerator
         $ref2 = null,
         $ref3 = null,
         $ref4 = null,
-        $ref5 = null
+        $ref5 = null,
+
+        // Authorization
+        $merchantId = null,
+
+        string $hashKey = null
+    ): string
+    {
+        $resultQueryString = $this->getResultQueryStringByParams(
+        // Order info
+            $trnAmount,
+            $trnOrderNumber,
+            $trnType,
+            $trnCardOwner,
+            $trnLanguage,
+
+            // Billing address
+            $ordName,
+            $ordEmailAddress,
+            $ordAddress1,
+            $ordAddress2,
+            $ordCity,
+            $ordProvince,
+            $ordPostalCode,
+            $ordCountry,
+
+            // Shipping address
+            $shipName,
+            $shipEmailAddress,
+            $shipAddress1,
+            $shipAddress2,
+            $shipCity,
+            $shipProvince,
+            $shipPostalCode,
+            $shipCountry,
+            $shipPhoneAddress,
+
+            // Redirects
+            $approvedPage,
+            $declinedPage,
+
+            // Hash expiry
+            $hashExpiry,
+
+            // References info
+            $ref1,
+            $ref2,
+            $ref3,
+            $ref4,
+            $ref5,
+
+            // Authorization
+            $merchantId,
+
+            $hashKey,
+        );
+
+        return "{$this->baseUrl}?{$resultQueryString}";
+    }
+
+    private function getResultQueryStringByParams(
+        // Order info
+        $trnAmount = null,
+        $trnOrderNumber = null,
+        $trnType = null,
+        $trnCardOwner = null,
+        $trnLanguage = null,
+
+        // Billing address
+        $ordName = null,
+        $ordEmailAddress = null,
+        $ordAddress1 = null,
+        $ordAddress2 = null,
+        $ordCity = null,
+        $ordProvince = null,
+        $ordPostalCode = null,
+        $ordCountry = null,
+
+        // Shipping address
+        $shipName = null,
+        $shipEmailAddress = null,
+        $shipAddress1 = null,
+        $shipAddress2 = null,
+        $shipCity = null,
+        $shipProvince = null,
+        $shipPostalCode = null,
+        $shipCountry = null,
+        $shipPhoneAddress = null,
+
+        // Redirects
+        $approvedPage = null,
+        $declinedPage = null,
+
+        // Hash expiry
+        $hashExpiry = null,
+
+        // References info
+        $ref1 = null,
+        $ref2 = null,
+        $ref3 = null,
+        $ref4 = null,
+        $ref5 = null,
+
+        // Authorization
+        $merchantId = null,
+
+        string $hashKey = null
+    ): string
+    {
+        $hashedParams = $this->getHashedParams(
+        // Order info
+            $trnAmount,
+            $trnOrderNumber,
+            $trnType,
+            $trnCardOwner,
+            $trnLanguage,
+
+            // Billing address
+            $ordName,
+            $ordEmailAddress,
+            $ordAddress1,
+            $ordAddress2,
+            $ordCity,
+            $ordProvince,
+            $ordPostalCode,
+            $ordCountry,
+
+            // Shipping address
+            $shipName,
+            $shipEmailAddress,
+            $shipAddress1,
+            $shipAddress2,
+            $shipCity,
+            $shipProvince,
+            $shipPostalCode,
+            $shipCountry,
+            $shipPhoneAddress,
+
+            // Redirects
+            $approvedPage,
+            $declinedPage,
+
+            // Hash expiry
+            $hashExpiry,
+
+            // References info
+            $ref1,
+            $ref2,
+            $ref3,
+            $ref4,
+            $ref5,
+
+            // Authorization
+            $merchantId
+        );
+
+        $hashedQueryString = http_build_query($hashedParams);
+        $resultHashKey = $this->getResultHashKey($hashKey);
+        $hashedString = $hashedQueryString . $resultHashKey;
+        $hashValue = $this->hash($hashedString);
+
+        $resultParams = array_merge($hashedParams, ['hashValue' => $hashValue]);
+
+        return http_build_query($resultParams);
+    }
+
+    private function getHashedParams(
+        // Order info
+        $trnAmount = null,
+        $trnOrderNumber = null,
+        $trnType = null,
+        $trnCardOwner = null,
+        $trnLanguage = null,
+
+        // Billing address
+        $ordName = null,
+        $ordEmailAddress = null,
+        $ordAddress1 = null,
+        $ordAddress2 = null,
+        $ordCity = null,
+        $ordProvince = null,
+        $ordPostalCode = null,
+        $ordCountry = null,
+
+        // Shipping address
+        $shipName = null,
+        $shipEmailAddress = null,
+        $shipAddress1 = null,
+        $shipAddress2 = null,
+        $shipCity = null,
+        $shipProvince = null,
+        $shipPostalCode = null,
+        $shipCountry = null,
+        $shipPhoneAddress = null,
+
+        // Redirects
+        $approvedPage = null,
+        $declinedPage = null,
+
+        // Hash expiry
+        $hashExpiry = null,
+
+        // References info
+        $ref1 = null,
+        $ref2 = null,
+        $ref3 = null,
+        $ref4 = null,
+        $ref5 = null,
+
+        // Authorization
+        $merchantId = null
     ): array
     {
         $params = $this->paramsToFilteredArray(
