@@ -1,0 +1,20 @@
+{
+    "name": "likemusic/bambora-checkout",
+    "description": "PHP SDK to generate payment url for bambora.com.",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Likemusic\\BamboraCheckout\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Valery Ivashchanka",
+            "email": "likemusicdev@gmail.com"
+        }
+    ],
+    "require-dev": {
+        "phpunit/phpunit": "^10"
+    }
+}
