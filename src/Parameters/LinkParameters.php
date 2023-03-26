@@ -9,8 +9,9 @@ use Likemusic\BamboraCheckout\Parameters\Parts\OrderInfoParameters;
 use Likemusic\BamboraCheckout\Parameters\Parts\RedirectsParameters;
 use Likemusic\BamboraCheckout\Parameters\Parts\ReferencesInfoParameters;
 use Likemusic\BamboraCheckout\Parameters\Parts\ShippingAddressParameters;
+use ReflectionClass;
 
-interface LinkParameters extends
+class LinkParameters implements
     AuthorizationParameters,
     OrderInfoParameters,
     BillingAddressParameters,
@@ -19,5 +20,10 @@ interface LinkParameters extends
     HashExpiryParameters,
     ReferencesInfoParameters
 {
+    static public function getNames(): array
+    {
+        $reflectionClass = new ReflectionClass(__CLASS__);
 
+        return array_values($reflectionClass->getConstants());
+    }
 }
